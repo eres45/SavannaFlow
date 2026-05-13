@@ -11,7 +11,7 @@ langchain-huggingface
 langchain-chroma
 pandas
 tabulate
-sentence-transformers
+huggingface_hub
 pydantic
 pydantic-settings
 python-multipart

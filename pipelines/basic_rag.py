@@ -18,8 +18,12 @@ class BasicRAGPipeline:
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not found in environment")
         
-        # Using local HuggingFace embeddings
-        self.embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        # Using Cloud-based embeddings to save RAM on Render
+        from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+        self.embeddings = HuggingFaceInferenceAPIEmbeddings(
+            api_key=os.getenv("HF_TOKEN"), 
+            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        )
         self.llm = ChatGroq(model_name=self.model_name, temperature=0)
         self.vectorstore = None
         self.data_path = data_path
