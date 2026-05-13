@@ -8,7 +8,7 @@ load_dotenv()
 class LLMOnlyPipeline:
     def __init__(self, model_name=None):
         self.api_key = os.getenv("GROQ_API_KEY")
-        self.model_name = model_name or os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+        self.model_name = model_name or "llama-3.3-70b-versatile"
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not found in environment")
         self.client = Groq(api_key=self.api_key)

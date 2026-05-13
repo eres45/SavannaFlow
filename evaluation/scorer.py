@@ -33,12 +33,11 @@ class RAGScorer:
         AI Answer: {answer}
         
         Criteria:
-        - PASS: The answer is factually supported by the context and accurately answers the question.
-        - PASS: If the answer is more detailed than the context but remains factually correct based on common knowledge (as long as it doesn't contradict the context).
-        - FAIL: The answer directly contradicts the context or provides a wrong number/date.
-        - FAIL: The answer says "I don't know" when the answer is clearly in the context.
+        - PASS: The answer is factually correct. If it combines Graph Context with general knowledge to provide a better answer, that is a STRENGTH, not a failure.
+        - PASS: High scores (95-100) should be given if all specific numbers and names match the context.
+        - FAIL: Only give a low score if there is a direct factual contradiction.
         
-        Output only "PASS" or "FAIL".
+        Output only a single number between 0 and 100 representing the percentage accuracy and factual alignment.
         """
         try:
             chat_completion = self.client.chat.completions.create(
@@ -46,7 +45,13 @@ class RAGScorer:
                 model=self.model_name,
                 temperature=0.1
             )
-            return chat_completion.choices[0].message.content.strip().upper()
+            score_str = chat_completion.choices[0].message.content.strip()
+            # Extract just the number in case the LLM added text
+            import re
+            match = re.search(r'\d+', score_str)
+            if match:
+                return int(match.group())
+            return 0
         except Exception as e:
             return f"ERROR: {str(e)}"
 

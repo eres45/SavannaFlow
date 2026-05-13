@@ -20,14 +20,17 @@ Traditional RAG relies on vector similarity, which often misses the **contextual
 
 ## 📊 Performance Benchmarks
 
-In our standardized "Multi-Hop" testing sweep, GraphRAG consistently outperformed traditional methods across all key metrics.
+In our standardized "Multi-Hop" testing sweep, GraphRAG consistently outperformed traditional methods across all### 📊 Final Benchmark Results (Live)
 
-| Metric | LLM-Only | Basic RAG (Vector) | **GraphRAG (TigerGraph)** |
+| Metric | LLM-Only | Basic RAG | **SavannaFlow (GraphRAG)** |
 | :--- | :---: | :---: | :---: |
-| **Context Accuracy** | Low (Hallucinations) | Medium (Text-Bound) | **High (Graph-Verified)** |
-| **Token Efficiency** | N/A | ~1500 Tokens | **~500 Tokens (3x Better)** |
-| **Cost per Query** | $0.00028 | $0.00026 | **$0.00009 (Best)** |
-| **Relationship Retrieval**| ❌ Failed | ⚠️ Hit/Miss | **✅ Guaranteed** |
+| **Avg Tokens** | 293 | 1346 | **325** |
+| **Accuracy** | 99% | 87% | **96.5%** |
+| **Token Savings** | - | - | **75.9% reduction** |
+| **Speed** | 2.0s | 1.6s | **1.8s** |
+| **Cost per Query** | $0.00004 | $0.00020 | **$0.00005 (Low Cost)** |
+
+---
 
 ### **Token Efficiency Comparison**
 ```mermaid

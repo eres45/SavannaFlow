@@ -1,6 +1,7 @@
 import os
 import time
 import requests
+import json
 from dotenv import load_dotenv
 from groq import Groq
 
@@ -9,7 +10,6 @@ load_dotenv()
 class GraphRAGPipeline:
     def __init__(self, graphname=None):
         self.host = os.getenv("TIGERGRAPH_HOST", "").rstrip("/")
-        # Using the FRESH secret provided by the user
         self.secret = "0uf9o0m918jphv7h3535mhla2o8rf84d" 
         self.graphname = graphname or os.getenv("TIGERGRAPH_GRAPHNAME", "MyGraphRAG")
         self.query_name = os.getenv("TIGERGRAPH_QUERY", "runGraphRAG")
@@ -20,16 +20,16 @@ class GraphRAGPipeline:
     def run(self, query):
         start_time = time.time()
         
+        # Clean query for better Graph matching (extract nouns/entities)
+        # For a hackathon, we focus on the core entities
+        search_terms = query.replace("?", "").replace("Compare", "").replace("between", "")
+        
         try:
-            params = {"p_query": query, "top_k": 3}
-            
-            # Step 1: Try the direct GSQL-Secret header (The "Alternative" simpler way)
-            # This is the most reliable way to use a secret directly without exchange
+            params = {"p_query": search_terms, "top_k": 5}
             headers = {"Authorization": f"GSQL-Secret {self.secret}"}
             
             tg_response = requests.get(self.api_url, params=params, headers=headers, timeout=20)
             
-            # Step 2: If 403, try the Token Exchange Flow (The "Official" way)
             if tg_response.status_code == 403:
                 token_res = requests.post(
                     f"{self.host}/restpp/requesttoken",
@@ -44,20 +44,41 @@ class GraphRAGPipeline:
             tg_response.raise_for_status()
             tg_data = tg_response.json()
             
-            # Extract content from the result set
-            graph_results = tg_data.get("results", [{}])[0].get("results", [])
-            context = "\n".join([r.get("attributes", {}).get("content", "") for r in graph_results])
+            # FLEXIBLE EXTRACTION: Catch 'Result.content', 'content', or any attribute
+            extracted_texts = []
+            results_block = tg_data.get("results", [{}])
             
-            if not context:
-                context = "No relevant graph relationships found for this query."
+            # Traverse the TigerGraph results format
+            for block in results_block:
+                inner_results = block.get("results", [])
+                for node in inner_results:
+                    attrs = node.get("attributes", {})
+                    # Try common TigerGraph result keys
+                    text = attrs.get("Result.content") or attrs.get("content") or attrs.get("text")
+                    if not text:
+                        # Fallback: just take the first string value we find
+                        for val in attrs.values():
+                            if isinstance(val, str) and len(val) > 10:
+                                text = val
+                                break
+                    if text:
+                        extracted_texts.append(text)
+
+            context = "\n".join(list(set(extracted_texts))) # Remove duplicates
+            
+            if not context or len(context) < 20:
+                context = "No specific graph nodes found for these keywords. Falling back to internal knowledge."
 
             # 2. Synthesize Answer
             prompt = f"""
             You are a GraphRAG specialized AI. Answer the question using the provided Graph Context.
-            Graph Context is highly structured and contains multi-hop relationships.
             
             Question: {query}
             Graph Context: {context}
+            
+            Guidelines:
+            - If the Context contains specific numbers (weights, dates, crew sizes), USE THEM.
+            - If the Context is missing specific facts, use your internal knowledge but mention 'Based on general aerospace history'.
             
             Answer:
             """
@@ -75,7 +96,7 @@ class GraphRAGPipeline:
                 "latency": end_time - start_time,
                 "tokens": chat_completion.usage.total_tokens,
                 "cost": chat_completion.usage.total_tokens * 0.00000015,
-                "context": context[:200] + "..."
+                "context": context[:300] + "..."
             }
 
         except Exception as e:

@@ -52,6 +52,7 @@ def run_official_benchmark():
                 row[f"{name} Tokens"] = res.get("tokens", 0)
                 row[f"{name} Latency"] = latency
                 row[f"{name} Judge"] = eval_res["judge"]
+                time.sleep(1) # Pacing to avoid rate limits
             except Exception as e:
                 print(f"Error in {name}: {e}")
                 row[f"{name} Tokens"] = 0
@@ -62,6 +63,10 @@ def run_official_benchmark():
 
     # Calculate Aggregates
     df = pd.DataFrame(results)
+    
+    # Ensure Judge columns are numeric
+    for col in [c for c in df.columns if "Judge" in c]:
+        df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
     
     # Generate Markdown Report
     report = f"""# 📊 Official Benchmark Report: GraphRAG vs. Basic RAG
@@ -76,7 +81,7 @@ def run_official_benchmark():
 | :--- | :---: | :---: | :---: |
 | **Avg Tokens** | {df['LLM Only Tokens'].mean():.1f} | {df['Basic RAG Tokens'].mean():.1f} | **{df['GraphRAG Tokens'].mean():.1f}** |
 | **Avg Latency** | {df['LLM Only Latency'].mean():.2f}s | {df['Basic RAG Latency'].mean():.2f}s | **{df['GraphRAG Latency'].mean():.2f}s** |
-| **Accuracy (Pass %)** | { (df['LLM Only Judge'].str.contains('PASS', case=False).mean() * 100):.1f}% | { (df['Basic RAG Judge'].str.contains('PASS', case=False).mean() * 100):.1f}% | **{ (df['GraphRAG Judge'].str.contains('PASS', case=False).mean() * 100):.1f}%** |
+| **Accuracy (Avg %)** | {df['LLM Only Judge'].mean():.1f}% | {df['Basic RAG Judge'].mean():.1f}% | **{df['GraphRAG Judge'].mean():.1f}%** |
 
 ## 📝 Query Log
 {df[['Question', 'LLM Only Tokens', 'Basic RAG Tokens', 'GraphRAG Tokens']].to_markdown(index=False)}

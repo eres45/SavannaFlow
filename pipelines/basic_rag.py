@@ -14,7 +14,7 @@ load_dotenv()
 class BasicRAGPipeline:
     def __init__(self, data_path=None, model_name=None):
         self.api_key = os.getenv("GROQ_API_KEY")
-        self.model_name = model_name or os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+        self.model_name = model_name or "llama-3.3-70b-versatile"
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not found in environment")
         

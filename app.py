@@ -59,18 +59,8 @@ async def query_pipelines(request: Request):
     graph_eval = scorer.evaluate_pipeline(query, graph_res.get("answer", ""), graph_res.get("context", ""))
 
     def format_accuracy(eval_res):
-        judge = eval_res["judge"].upper()
-        # Simple heuristic to extract a score from the judge's text or default based on PASS/FAIL
-        if "EXCELLENT" in judge or "PERFECT" in judge:
-            score = "98%"
-        elif "PASS" in judge or "GOOD" in judge:
-            score = "85%"
-        elif "PARTIAL" in judge:
-            score = "60%"
-        else:
-            score = "35%"
-        
-        return f"{score}"
+        score = eval_res.get("judge", 0)
+        return f"{score}%"
 
     # Format results for the dashboard
     return {
