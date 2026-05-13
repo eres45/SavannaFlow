@@ -9,7 +9,7 @@ load_dotenv()
 class RAGScorer:
     def __init__(self, model_name=None):
         self.api_key = os.getenv("GROQ_API_KEY")
-        self.model_name = model_name or os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+        self.model_name = model_name or "llama-3.3-70b-versatile"
         if self.api_key:
             self.client = Groq(api_key=self.api_key)
         
@@ -20,22 +20,23 @@ class RAGScorer:
             print("Warning: BERTScore failed to load. Ensure 'bert-score' and 'evaluate' are installed.")
             self.bertscore = None
 
-    def llm_judge(self, question, answer, reference):
+    def llm_judge(self, question, answer, context):
         """
-        Uses an LLM to grade the answer as PASS/FAIL based on a reference.
+        Uses an LLM to grade the answer as PASS/FAIL based on the retrieved context.
         """
         prompt = f"""
-        Role: Accuracy Judge
-        Task: Grade the AI's answer against the reference answer for the given question.
+        Role: Aerospace Accuracy Judge
+        Task: Grade the AI's answer based on the retrieved context for the given question.
         
         Question: {question}
-        Reference Answer: {reference}
+        Retrieved Context: {context}
         AI Answer: {answer}
         
         Criteria:
-        - The AI answer must be factually consistent with the reference.
-        - It must directly answer the question.
-        - Minor stylistic differences are allowed.
+        - PASS: The answer is factually supported by the context and accurately answers the question.
+        - PASS: If the answer is more detailed than the context but remains factually correct based on common knowledge (as long as it doesn't contradict the context).
+        - FAIL: The answer directly contradicts the context or provides a wrong number/date.
+        - FAIL: The answer says "I don't know" when the answer is clearly in the context.
         
         Output only "PASS" or "FAIL".
         """
@@ -43,6 +44,7 @@ class RAGScorer:
             chat_completion = self.client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
                 model=self.model_name,
+                temperature=0.1
             )
             return chat_completion.choices[0].message.content.strip().upper()
         except Exception as e:
