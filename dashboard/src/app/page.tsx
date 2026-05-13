@@ -54,7 +54,8 @@ export default function Dashboard() {
     setLoading(true);
     
     try {
-      const response = await fetch("http://localhost:8000/query", {
+      const apiHost = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiHost}/query`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
