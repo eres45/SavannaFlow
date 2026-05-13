@@ -4,6 +4,8 @@ python-dotenv
 requests
 groq
 langchain
+langchain-community
+langchain-core
 langchain-groq
 langchain-huggingface
 langchain-chroma
