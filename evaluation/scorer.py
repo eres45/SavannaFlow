@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from groq import Groq
-from evaluate import load
+# from evaluate import load  <-- Moved inside class to avoid crashes
 import pandas as pd
 
 load_dotenv()
@@ -13,11 +13,12 @@ class RAGScorer:
         if self.api_key:
             self.client = Groq(api_key=self.api_key)
         
-        # Load BERTScore evaluator
+        # Load BERTScore evaluator only if needed
         try:
+            from evaluate import load
             self.bertscore = load("bertscore")
         except:
-            print("Warning: BERTScore failed to load. Ensure 'bert-score' and 'evaluate' are installed.")
+            print("Warning: BERTScore failed to load. This is normal in production.")
             self.bertscore = None
 
     def llm_judge(self, question, answer, context):
