@@ -23,11 +23,11 @@ class BasicRAGPipeline:
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not found in environment")
         
-        # Using Cloud-based embeddings to save RAM on Render
-        from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
-        self.embeddings = HuggingFaceInferenceAPIEmbeddings(
-            api_key=os.getenv("HF_TOKEN"), 
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        # Using modern HuggingFace Endpoint for stability
+        from langchain_huggingface import HuggingFaceEndpointEmbeddings
+        self.embeddings = HuggingFaceEndpointEmbeddings(
+            huggingfacehub_api_token=os.getenv("HF_TOKEN"), 
+            model="sentence-transformers/all-MiniLM-L6-v2"
         )
         self.llm = ChatGroq(model_name=self.model_name, temperature=0)
         
