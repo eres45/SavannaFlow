@@ -30,7 +30,16 @@ class BasicRAGPipeline:
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
         self.llm = ChatGroq(model_name=self.model_name, temperature=0)
-        self.vectorstore = None
+        
+        # Load vectorstore immediately if it exists
+        if os.path.exists(self.db_path):
+            from langchain_community.vectorstores import Chroma
+            self.vectorstore = Chroma(persist_directory=self.db_path, embedding_function=self.embeddings)
+            print(f"Basic RAG: Vector store loaded successfully with {self.vectorstore._collection.count()} documents.", flush=True)
+        else:
+            self.vectorstore = None
+            print("Basic RAG: Vector store not found on startup.", flush=True)
+            
         self.data_path = data_path
 
     def ingest(self, file_path):
