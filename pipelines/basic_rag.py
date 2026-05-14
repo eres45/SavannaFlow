@@ -36,6 +36,8 @@ class BasicRAGPipeline:
         with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
         
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+        chunks = text_splitter.split_text(text)
         # Limit to first 1000 chunks for demo stability (avoiding API timeouts)
         chunks = chunks[:1000]
         
