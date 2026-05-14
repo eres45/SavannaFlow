@@ -14,6 +14,12 @@ class BasicRAGPipeline:
     def __init__(self, data_path=None, model_name=None):
         self.api_key = os.getenv("GROQ_API_KEY")
         self.model_name = model_name or "llama-3.3-70b-versatile"
+        
+        # Absolute Path Hardening
+        self.base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.db_path = os.path.join(self.base_dir, "data", "chroma_db")
+        print(f"Basic RAG: Vector DB Path set to {self.db_path}", flush=True)
+        
         if not self.api_key:
             raise ValueError("GROQ_API_KEY not found in environment")
         
@@ -46,7 +52,7 @@ class BasicRAGPipeline:
         batch_size = 10
         self.vectorstore = Chroma(
             embedding_function=self.embeddings,
-            persist_directory="./data/chroma_db"
+            persist_directory=self.db_path
         )
         
         for i in range(0, len(chunks), batch_size):
@@ -62,10 +68,11 @@ class BasicRAGPipeline:
     def run(self, query):
         if not self.vectorstore:
             # Auto-healing: Try to load from disk or re-ingest if raw data exists
-            if os.path.exists("./data/chroma_db"):
-                self.vectorstore = Chroma(persist_directory="./data/chroma_db", embedding_function=self.embeddings)
+            if os.path.exists(self.db_path):
+                print(f"Basic RAG: Loading existing DB from {self.db_path}", flush=True)
+                self.vectorstore = Chroma(persist_directory=self.db_path, embedding_function=self.embeddings)
             elif os.path.exists("data/raw/space_data.txt"):
-                print("Vector store missing on cloud. Auto-ingesting now...", flush=True)
+                print("Basic RAG: Vector store missing. Auto-ingesting raw data...", flush=True)
                 self.ingest("data/raw/space_data.txt")
             else:
                 return {"error": "Vector store and raw data missing. Please check your data folder."}

@@ -15,6 +15,13 @@ class GraphRAGPipeline:
         self.query_name = os.getenv("TIGERGRAPH_QUERY", "runGraphRAG")
         self.api_url = f"{self.host}/restpp/query/{self.graphname}/{self.query_name}"
         
+        # Enhanced Logging for Auth Debugging
+        print(f"GraphRAG: Initializing with Host: {self.host}", flush=True)
+        if not self.secret:
+            print("GraphRAG ERROR: TIGERGRAPH_TOKEN is missing from environment!", flush=True)
+        else:
+            print(f"GraphRAG: Token found (ends with ...{self.secret[-4:]})", flush=True)
+            
         self.client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
     def run(self, query):
