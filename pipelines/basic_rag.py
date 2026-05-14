@@ -36,14 +36,25 @@ class BasicRAGPipeline:
         with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
         
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        chunks = text_splitter.split_text(text)
+        # Limit to first 1000 chunks for demo stability (avoiding API timeouts)
+        chunks = chunks[:1000]
         
-        self.vectorstore = Chroma.from_texts(
-            texts=chunks, 
-            embedding=self.embeddings,
+        # Batching for Cloud API stability (10 chunks at a time)
+        print(f"Creating vector store with {len(chunks)} chunks in batches of 10...")
+        batch_size = 10
+        self.vectorstore = Chroma(
+            embedding_function=self.embeddings,
             persist_directory="./data/chroma_db"
         )
+        
+        for i in range(0, len(chunks), batch_size):
+            batch = chunks[i:i + batch_size]
+            try:
+                self.vectorstore.add_texts(texts=batch)
+                print(f"Ingested batch {i//batch_size + 1}", flush=True)
+                time.sleep(1) # More conservative pacing
+            except Exception as e:
+                print(f"Batch {i//batch_size + 1} failed: {e}. Skipping...")
         print("Ingestion complete.", flush=True)
 
     def run(self, query):

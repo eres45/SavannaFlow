@@ -10,7 +10,7 @@ load_dotenv()
 class GraphRAGPipeline:
     def __init__(self, graphname=None):
         self.host = os.getenv("TIGERGRAPH_HOST", "").rstrip("/")
-        self.secret = "0uf9o0m918jphv7h3535mhla2o8rf84d" 
+        self.secret = os.getenv("TIGERGRAPH_TOKEN")
         self.graphname = graphname or os.getenv("TIGERGRAPH_GRAPHNAME", "MyGraphRAG")
         self.query_name = os.getenv("TIGERGRAPH_QUERY", "runGraphRAG")
         self.api_url = f"{self.host}/restpp/query/{self.graphname}/{self.query_name}"
@@ -26,21 +26,14 @@ class GraphRAGPipeline:
         
         try:
             params = {"p_query": clean_query, "top_k": 5}
-            # Switch to Bearer token for Savanna 4.x stability
-            headers = {"Authorization": f"Bearer {self.secret}"}
             
+            # Hybrid Auth: Try Bearer first, fallback to GSQL-Secret
+            headers = {"Authorization": f"Bearer {self.secret}"}
             tg_response = requests.get(self.api_url, params=params, headers=headers, timeout=20)
             
-            if tg_response.status_code == 403:
-                token_res = requests.post(
-                    f"{self.host}/restpp/requesttoken",
-                    json={"secret": self.secret, "lifetime": "2592000"},
-                    timeout=10
-                )
-                if token_res.status_code == 200:
-                    token = token_res.json().get("token")
-                    headers = {"Authorization": f"Bearer {token}"}
-                    tg_response = requests.get(self.api_url, params=params, headers=headers, timeout=20)
+            if tg_response.status_code in [401, 403]:
+                headers = {"Authorization": f"GSQL-Secret {self.secret}"}
+                tg_response = requests.get(self.api_url, params=params, headers=headers, timeout=20)
 
             tg_response.raise_for_status()
             tg_data = tg_response.json()
