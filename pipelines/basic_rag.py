@@ -48,11 +48,14 @@ class BasicRAGPipeline:
 
     def run(self, query):
         if not self.vectorstore:
-            # Try to load from disk if exists
+            # Auto-healing: Try to load from disk or re-ingest if raw data exists
             if os.path.exists("./data/chroma_db"):
                 self.vectorstore = Chroma(persist_directory="./data/chroma_db", embedding_function=self.embeddings)
+            elif os.path.exists("data/raw/space_data.txt"):
+                print("Vector store missing on cloud. Auto-ingesting now...", flush=True)
+                self.ingest("data/raw/space_data.txt")
             else:
-                return {"error": "Vector store not initialized. Run ingest() first."}
+                return {"error": "Vector store and raw data missing. Please check your data folder."}
 
         start_time = time.time()
         

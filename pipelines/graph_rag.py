@@ -26,7 +26,8 @@ class GraphRAGPipeline:
         
         try:
             params = {"p_query": clean_query, "top_k": 5}
-            headers = {"Authorization": f"GSQL-Secret {self.secret}"}
+            # Switch to Bearer token for Savanna 4.x stability
+            headers = {"Authorization": f"Bearer {self.secret}"}
             
             tg_response = requests.get(self.api_url, params=params, headers=headers, timeout=20)
             
