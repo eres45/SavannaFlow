@@ -20,12 +20,12 @@ class GraphRAGPipeline:
     def run(self, query):
         start_time = time.time()
         
-        # Clean query for better Graph matching (extract nouns/entities)
-        # For a hackathon, we focus on the core entities
-        search_terms = query.replace("?", "").replace("Compare", "").replace("between", "")
+        # Aggressive cleaning for TigerGraph stability
+        clean_query = "".join(e for e in query if e.isalnum() or e.isspace())
+        clean_query = clean_query.strip().replace(" ", "+")
         
         try:
-            params = {"p_query": search_terms, "top_k": 5}
+            params = {"p_query": clean_query, "top_k": 5}
             headers = {"Authorization": f"GSQL-Secret {self.secret}"}
             
             tg_response = requests.get(self.api_url, params=params, headers=headers, timeout=20)
