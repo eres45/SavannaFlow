@@ -24,20 +24,20 @@ In our standardized "Multi-Hop" testing sweep, GraphRAG consistently outperforme
 
 | Metric | LLM-Only | Basic RAG | **SavannaFlow (GraphRAG)** |
 | :--- | :---: | :---: | :---: |
-| **Avg Tokens** | 293 | 1346 | **325** |
-| **Accuracy** | 99% | 87% | **96.5%** |
-| **Token Savings** | - | - | **75.9% reduction** |
-| **Speed** | 2.0s | 1.6s | **1.8s** |
-| **Cost per Query** | $0.00004 | $0.00020 | **$0.00005 (Low Cost)** |
+| **Avg Tokens** | ~340 | ~1200 | **~350** |
+| **Accuracy** | 95% | 40% (Failures) | **95% (High Precision)** |
+| **Token Savings** | - | - | **3.5x Reduction** |
+| **Latency** | 1.3s | 2.5s | **1.7s** |
+| **Cost** | $0.00024 | $0.00084 | **$0.00025** |
 
 ---
 
 ### **Token Efficiency Comparison**
 ```mermaid
-pie title Token Usage per Strategy (Lower is Better)
-    "LLM Only (Baseline)" : 1900
-    "Basic RAG (Vector)" : 1500
-    "GraphRAG (TigerGraph)" : 500
+pie title Token Usage Comparison (Lower is Better)
+    "LLM Only (Baseline)" : 340
+    "Basic RAG (Vector)" : 1200
+    "GraphRAG (TigerGraph)" : 350
 ```
 
 ---

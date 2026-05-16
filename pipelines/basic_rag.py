@@ -88,38 +88,39 @@ class BasicRAGPipeline:
 
         start_time = time.time()
         
-        template = """Answer the question based only on the following context:
+        # 1. Retrieve Context
+        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 5})
+        docs = retriever.invoke(query)
+        context = "\n\n".join(doc.page_content for doc in docs)
+        
+        # 2. Generate Answer with Raw Client for Token Precision
+        from groq import Groq
+        client = Groq(api_key=self.api_key)
+        
+        prompt = f"""Answer the question based only on the following context:
 {context}
 
-Question: {question}
+Question: {query}
 """
-        prompt = ChatPromptTemplate.from_template(template)
-        retriever = self.vectorstore.as_retriever(search_kwargs={"k": 5})
         
-        def format_docs(docs):
-            return "\n\n".join(doc.page_content for doc in docs)
-
-        rag_chain = (
-            {"context": retriever | format_docs, "question": RunnablePassthrough()}
-            | prompt
-            | self.llm
-            | StrOutputParser()
+        chat_completion = client.chat.completions.create(
+            messages=[{"role": "user", "content": prompt}],
+            model=self.model_name,
+            temperature=0
         )
         
-        answer = rag_chain.invoke(query)
-        
+        answer = chat_completion.choices[0].message.content
         end_time = time.time()
-        latency = end_time - start_time
         
-        # Token estimation
-        approx_tokens = (len(query) + (5 * 1000) + len(answer)) // 4
+        # ACTUAL token counting from Groq response
+        tokens_used = chat_completion.usage.total_tokens
         
         return {
             "answer": answer,
-            "latency": latency,
-            "tokens": int(approx_tokens),
-            "cost": approx_tokens * 0.00000015,
-            "sources": [] # Could be populated by running retriever separately
+            "latency": end_time - start_time,
+            "tokens": tokens_used,
+            "cost": tokens_used * 0.00000070,
+            "sources": [doc.metadata for doc in docs] 
         }
 
 if __name__ == "__main__":

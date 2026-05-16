@@ -96,7 +96,7 @@ class GraphRAGPipeline:
                 "answer": answer,
                 "latency": end_time - start_time,
                 "tokens": chat_completion.usage.total_tokens,
-                "cost": chat_completion.usage.total_tokens * 0.00000015,
+                "cost": chat_completion.usage.total_tokens * 0.00000070,
                 "context": context[:300] + "..."
             }
 

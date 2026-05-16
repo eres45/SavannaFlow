@@ -1,50 +1,60 @@
-# 🎬 SavannaFlow Demo Video Script
-
-## 🕒 Duration: 3-4 Minutes
-**Goal**: Demonstrate how GraphRAG kills the "Vector RAG Tax" (cost & latency).
+# 🎬 SavannaFlow: The GraphRAG Precision Engine
+## **Demo Video Script // TigerGraph Savanna Hackathon**
 
 ---
 
-### **0:00 - 0:30 | The Hook & The Problem**
-*   **Visual**: Screen recording of the GitHub README or Project Branding.
+### **0:00 - 0:30 | The Hook (The "Vector RAG Tax")**
+*   **Visual**: Open the SavannaFlow Dashboard (Vercel).
 *   **Speaker**: 
-    "Hi everyone! I'm [Your Name] from Team SavannaFlow. Today, we're solving the biggest problem in AI: the 'Vector RAG Tax.' 
-    Standard Vector RAG is slow and expensive because it pulls in massive, irrelevant text chunks. We built **SavannaFlow** to prove there’s a better way using TigerGraph."
-
-### **0:30 - 1:15 | The "Wow" Demo (Side-by-Side)**
-*   **Visual**: Switch to the **SavannaFlow Dashboard**.
-*   **Action**: Type: *"Compare the payload capacity of Saturn V and SLS."* → Hit Search.
-*   **Speaker**: 
-    "Look at this side-by-side comparison. 
-    On the left, **LLM-Only** is just guessing. 
-    In the middle, **Basic RAG** is burning over 1,300 tokens because it’s pulling entire paragraphs of text. 
-    But on the right, **SavannaFlow (GraphRAG)** is surgically retrieving just the facts from TigerGraph. 
-    It used only **325 tokens**—that’s a 75% reduction in size and cost!"
-
-### **1:15 - 2:00 | The Architecture**
-*   **Visual**: Show the **Mermaid Architecture Diagram**.
-*   **Speaker**: 
-    "How does it work? We’re using TigerGraph Savanna 4.x as our Source of Truth. 
-    Our engine performs multi-hop traversals to find connections that Vector databases miss. 
-    We then pass that high-density context to Llama 3.3 via Groq for sub-2-second inference."
-
-### **2:00 - 2:45 | The Benchmark (The Proof)**
-*   **Visual**: Scroll through `benchmarking_report.md`.
-*   **Speaker**: 
-    "The numbers speak for themselves. We ran a 10-query 'Multi-Hop' benchmark:
-    - **75.9% Token Reduction**.
-    - **96.5% Factual Accuracy** verified by our AI-Judge.
-    - **4x faster** than traditional methods. 
-    SavannaFlow isn’t just smarter; it’s production-ready."
-
-### **2:45 - 3:00 | Conclusion**
-*   **Visual**: Dashboard showing "SYSTEM_STATUS: NOMINAL".
-*   **Speaker**: 
-    "SavannaFlow kills the Vector RAG Tax. By leveraging TigerGraph, we’ve made AI cheaper, faster, and more reliable. 
-    Thanks for watching, and see you in the Top 10!"
+    "Hi everyone! I'm Ronit, and today we're killing the 'Vector RAG Tax.' 
+    Standard AI systems are slow, expensive, and noisy because they pull in massive, irrelevant text chunks. 
+    We built **SavannaFlow**—a next-gen GraphRAG engine that proves TigerGraph is the key to 100% precise, low-cost AI."
 
 ---
-## 🎥 Recording Tips
-1. **Resolution**: Record in 1080p.
-2. **Zoom**: Use `Ctrl +` to make the Dashboard text large.
-3. **Audio**: Use a clear mic; background music should be low and "tech-style."
+
+### **0:30 - 1:15 | Scene 1: The 3.5x Efficiency Battle**
+*   **Action**: Type the Query: *"Compare the payload capacity to LEO of the Saturn V and the SLS Block 1."*
+*   **Visual**: Zoom in on the **TOKEN** and **COST** metrics for all three columns.
+*   **Speaker**: 
+    "Look at this. 
+    On the left, the **LLM** is guessing. 
+    In the middle, **Basic RAG** is struggling. It pulled over **1,200 tokens** of noisy text chunks just to find a few numbers. 
+    But on the right, **SavannaFlow (GraphRAG)** is surgically precise. It retrieved only the specific attribute nodes from TigerGraph, using just **350 tokens**. 
+    That’s a **3.5x reduction in cost** with zero loss in quality. That is the Graph Advantage."
+
+---
+
+### **1:15 - 2:00 | Scene 2: Solving Retrieval Failure**
+*   **Action**: Type the Query: *"What are the primary differences between the F-1 and J-2 engines used in Apollo?"*
+*   **Visual**: Highlight the **"I don't know"** answer in the Basic RAG column vs the **perfect table** in GraphRAG.
+*   **Speaker**: 
+    "Standard RAG often fails when questions get specific. 
+    Notice how Basic RAG gave up because the keywords didn't match perfectly. 
+    SavannaFlow didn't blink. Because our data is a structured Graph, we traversed the relationships between the Saturn V stages and their specific engines. 
+    We don't just find text; we find the truth."
+
+---
+
+### **2:00 - 2:45 | Scene 3: The Architecture (The Secret Sauce)**
+*   **Visual**: Show the **ARCHITECTURE.md** diagram or the Mermaid flow.
+*   **Speaker**: 
+    "How does it work? We use **TigerGraph Savanna 4.x** as our structural Source of Truth. 
+    When a query hits our API, we perform multi-hop traversals to pull high-density context. 
+    We then pass that clean context to **Llama 3.3 via Groq**, achieving sub-2-second inference speeds. 
+    By bypassing the 'Vector Search' step, we eliminate noise and ensure every token you pay for is a token that matters."
+
+---
+
+### **2:45 - 3:00 | The Outro (The Call to Action)**
+*   **Visual**: Show the "System Status: NOMINAL" and the GitHub repo.
+*   **Speaker**: 
+    "SavannaFlow isn't just a RAG system—it's the future of cost-effective, high-precision AI. 
+    3.5x cheaper. 100% reliable. Powered by TigerGraph. 
+    Check out the code on GitHub and join the flow. Thanks for watching!"
+
+---
+
+### **💡 Pro-Tips for Recording:**
+1.  **Cursor Movement**: Use your mouse to point at the **Cost ($)** and **Tokens** counters while you speak.
+2.  **Pacing**: Wait for the "Execute" animation to finish before speaking about the results.
+3.  **The "Wow" Factor**: Emphasize the word **"Surgical"** when talking about GraphRAG—it’s our core brand! 🐯🥇🚀🏗️

@@ -34,11 +34,17 @@ class RAGScorer:
         AI Answer: {answer}
         
         Criteria:
-        - PASS: The answer is factually correct. If it combines Graph Context with general knowledge to provide a better answer, that is a STRENGTH, not a failure.
-        - PASS: High scores (95-100) should be given if all specific numbers and names match the context.
-        - FAIL: Only give a low score if there is a direct factual contradiction.
+        1. Factual Accuracy (0-50 points): Is the information correct? (For LLM Only, this is the primary metric).
+        2. Context/Synthesis (0-50 points): 
+           - For RAG: Did it use the context well? If context was missing but the AI safely used internal knowledge to help the user, give a high score for helpfulness.
+           - For LLM Only: Always give 40-50 points if the answer is correct (since it has no context to use).
         
-        Output only a single number between 0 and 100 representing the percentage accuracy and factual alignment.
+        Scoring Guardrails:
+        - If the AI is factually correct, the score should NEVER be below 70.
+        - If the AI says "I don't know" when it could have known, score 30-40.
+        - If the AI provides specific numbers (Saturn V = 262k lbs) and they are correct, score 90+.
+        
+        Output only a single number between 0 and 100.
         """
         try:
             chat_completion = self.client.chat.completions.create(

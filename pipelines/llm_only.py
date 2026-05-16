@@ -36,7 +36,7 @@ class LLMOnlyPipeline:
             "answer": chat_completion.choices[0].message.content,
             "latency": latency,
             "tokens": tokens_used,
-            "cost": tokens_used * 0.00000015 # Adjust based on Groq/model pricing
+            "cost": tokens_used * 0.00000070 # Realistic Llama 3.3 70B pricing
         }
 
 if __name__ == "__main__":
